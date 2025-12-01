@@ -5,17 +5,17 @@
 Масштабируемая архитектура с разделением ответственности.
 """
 
-from abc import ABC, abstractmethod
-from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
-import cv2
+import math
 import os
 import sys
 import urllib.request
-import math
+from abc import ABC, abstractmethod
+from typing import List, Optional
+
+import cv2
 import numpy as np
 from PIL import Image, ImageDraw
-
+from pydantic import BaseModel, ConfigDict
 
 # ============== Pydantic Models ==============
 
@@ -183,9 +183,7 @@ class FaceDetectionValidator(IValidator):
 class CenteringValidator(IValidator):
     """Валидатор центрирования лица"""
 
-    def __init__(
-        self, horizontal_threshold: float = 0.1, vertical_threshold: float = 0.25
-    ):
+    def __init__(self, horizontal_threshold: float = 0.1, vertical_threshold: float = 0.25):
         self.horizontal_threshold = horizontal_threshold
         self.vertical_threshold = vertical_threshold
 
@@ -331,12 +329,8 @@ class DebugVisualizer:
         offset_y = 0
 
         # Конвертируем в PIL для работы с прозрачностью
-        border_pil = Image.fromarray(
-            cv2.cvtColor(border_image, cv2.COLOR_BGR2RGB)
-        ).convert("RGBA")
-        photo_pil = Image.fromarray(
-            cv2.cvtColor(final_image, cv2.COLOR_BGR2RGB)
-        ).convert("RGBA")
+        border_pil = Image.fromarray(cv2.cvtColor(border_image, cv2.COLOR_BGR2RGB)).convert("RGBA")
+        photo_pil = Image.fromarray(cv2.cvtColor(final_image, cv2.COLOR_BGR2RGB)).convert("RGBA")
 
         # Делаем фото полупрозрачным (альфа 128 = 50%)
         photo_data = photo_pil.getdata()
