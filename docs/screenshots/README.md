@@ -1,20 +1,18 @@
-<!-- house-style: template — fill this file in, then delete this line -->
-
 # Screenshots
 
-Images referenced from the README and the documents.
+The repository holds no images.
 
-<!--
-  Put the files here and reference them from the README:
+photo-checker makes one picture, the debug image a failed run writes into
+`outputs/cn_<original name>`. It is a product of the run rather than a
+documented state of the interface, and it is not tracked: `outputs/` is
+created on demand and `.gitignore` keeps it out of the repository.
 
-  ```markdown
-  ![The main window](docs/screenshots/main.png)
-  ```
+Two more files sit outside the repository for the same reason. The YuNet
+model, `face_detection_yunet_2023mar.onnx`, is downloaded into the working
+directory on the first run. The reference frame,
+`faces/img/border_black.png`, is the picture the debug image is drawn over,
+and `faces/` is gitignored, so a fresh checkout draws over a black 1000 by
+1000 fallback instead.
 
-  Images are referenced by relative path, so they resolve both on GitHub and
-  in a local checkout. The house-style checker verifies that every image
-  reference points at a file that exists, so a renamed screenshot cannot
-  quietly break the README.
-
-  Delete this file once the project has images of its own.
--->
+The folder holds this file and nothing else. When a picture is worth
+keeping, put it here and point at it from the README with a relative path.

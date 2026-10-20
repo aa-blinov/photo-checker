@@ -1,137 +1,178 @@
-<!-- house-style: template — fill this file in, then delete this line -->
-
 ---
 name: photo-checker
-description: One line that says what this does.
+description: The marks a rejected photograph carries. There is no interface beyond the JSON verdict and the debug image.
 colors:
-  primary: "#2b3a55"
-  neutral-bg: "#faf7f2"
+  landmark: "#FF0000"
+  eye-line: "#00FF00"
+  nose: "#00FFFF"
+  centre-cross: "#FFFF00"
+  frame: "#000000"
 typography:
-  body:
-    fontFamily: "system-ui, -apple-system, Segoe UI, sans-serif"
-    fontSize: "16px"
-    fontWeight: 400
-    lineHeight: 1.6
-  title:
-    fontFamily: "system-ui, -apple-system, Segoe UI, sans-serif"
-    fontSize: "32px"
-    fontWeight: 700
-    lineHeight: 1.2
-    letterSpacing: "-0.02em"
+  verdict:
+    fontFamily: "not set by the code"
+    fontSize: "not set by the code"
+    indent: "2 spaces"
 rounded:
-  md: "8px"
+  landmark: "8px"
+  nose: "10px"
 spacing:
-  sm: "8px"
-  md: "16px"
+  cross-arm: "40px"
+  eye-line-width: "3px"
+  cross-width: "2px"
 ---
 
-# Design System: photo-checker
-
-<!--
-  A stub. Fill it in when the project has a visual system, or delete the
-  file if it does not have one — a project with no interface does not need
-  a design document, and an empty one is worse than none.
-
-  The frontmatter is normative: it is the machine-readable token layer that
-  tools consume. The prose explains how to apply the tokens. When they
-  disagree, the frontmatter is right.
-
-  Keep the eight sections in this order. Omit the ones that do not apply.
--->
+# Design system: photo-checker
 
 ## Overview
 
-**Creative North Star: "[a named metaphor]"**
+**Creative North Star: "The marked photograph"**
 
-<!--
-  Two or three paragraphs: the personality, the density, the aesthetic
-  philosophy. Start from the north star and work outward. State the
-  confirmed rejections. End with a short key-characteristics list.
--->
+photo-checker has no interface of its own. There is no window, no page, no
+menu and no type on a screen. What the product puts in front of a person is
+a JSON object on stdout and, when a rule fails, one picture written into
+`outputs/`.
+
+That picture is the whole visual output, and the code draws it with a fixed
+set of marks: five red dots for the landmarks, a green line between the eyes,
+a cyan dot for the nose and a yellow cross at the centre of the frame. The
+photograph sits under them at half opacity, over a black ground.
+
+Every decision in this document concerns one diagram. They are written down so
+that a change to the marks is a deliberate change rather than a drift.
+
+Key characteristics:
+
+- One picture, drawn in one place, `DebugVisualizer.create_debug_image`.
+- Four colours, one for each mark, and no colour for anything else.
+- The geometry lives in the code: radius 8 for a landmark, radius 10 for the
+  nose, a 3px eye line, a 2px cross with 40px arms.
+- No type, no spacing scale and no radius ladder. The output is a
+  photograph with marks on it.
 
 ## Colors
 
-<!--
-  Group by role, not by hue. Primary, secondary, tertiary, neutral — and
-  name the colours rather than listing hex codes in prose, because the
-  frontmatter already carries the values.
--->
+Four colours, one for each mark, and the black of the frame underneath.
 
 ### Primary
 
-- **[Descriptive name]** (`#2b3a55`): where and why it is used.
+- **Landmark** (`#FF0000`): the five points of the face, drawn as filled
+  ellipses of radius 8. The right eye, the left eye, the nose tip and the
+  two corners of the mouth.
+- **Eye line** (`#00FF00`): the segment between the two eye landmarks, 3px
+  wide. It is the roll, drawn, so a tilted head is visible at a glance.
+- **Nose** (`#00FFFF`): the third landmark, drawn as a filled ellipse of
+  radius 10, so it reads over the red dot underneath it.
+- **Centre cross** (`#FFFF00`): two strokes of 2px and 40px each, one
+  horizontal and one vertical, at the centre of the frame. It is the target
+  the nose is measured against.
 
 ### Neutral
 
-- **[Descriptive name]** (`#faf7f2`): the ground.
+- **Frame** (`#000000`): the 1000 by 1000 fallback picture when
+  `faces/img/border_black.png` is missing, and the ground the photograph is
+  composited onto. The reference frame in a full checkout is a black
+  picture with a border, so the photograph sits inside it.
 
-### Named Rules
+### Named rules
 
-**The [Rule Name] Rule.** A short, memorable doctrine.
+**The One Photograph Rule.** The photograph is the picture. Every mark is
+drawn over it at half opacity, never over an opaque panel, so the person
+looks at their own face and not at a diagram of it.
+
+**The Shape Carries Meaning Rule.** The marks differ in shape as well as in
+colour: a dot for a point, a line for a line, a cross for a target. Colour
+is the second signal.
 
 ## Typography
 
-**Display Font:** [family]
-**Body Font:** [family]
+**Display Font:** none
+**Body Font:** none
 
-<!--
-  The hierarchy, with the real values: display, headline, title, body,
-  label. Say what each one is for and where it appears.
--->
+The product sets no font and no size. The only typographic decision in the
+code is the two-space indent of the result, `model_dump_json(indent=2)`. The
+JSON goes to stdout and whatever renders it decides the rest.
+
+The `text` field of a failure is a Russian sentence inside that JSON. It
+carries no weight, no size and no language of its own; it inherits the
+terminal's.
 
 ## Layout
 
-<!--
-  The spatial model: the grid, the container, the density, the spacing
-  rhythm, what changes on a narrow screen.
--->
+One picture, one size: the frame. When `faces/img/border_black.png` is
+missing, the frame is 1000 by 1000 pixels of black. When the file is there,
+the frame's own size decides everything and the photograph is resized to it.
+
+The photograph is stretched to the frame, not letterboxed. `cv2.resize` takes
+the width and the height and ignores the aspect ratio, so a 1152 by 560
+photograph comes out square. The landmarks are scaled by the same two
+factors, so they stay on top of the face they came from.
+
+There is no margin and no padding around the photograph inside the frame.
+The reference picture carries the border.
 
 ## Elevation & Depth
 
-<!--
-  Flat, layered or lifted. If there are no shadows, say so explicitly and
-  describe how depth is conveyed instead.
--->
+There is no depth in the product. The frame is a flat black ground, the
+photograph sits on it at 50% opacity, and the marks are drawn on top at full
+opacity.
+
+The opacity is the only layering there is. It lets the border of the
+reference frame show through the photograph, so the person can see where the
+frame ends.
 
 ## Shapes
 
-<!--
-  The radius strategy, the borders, the clipping, the recurring form.
--->
+The marks are the shapes. Two ellipses and three lines:
+
+| Mark | Shape | Size |
+| --- | --- | --- |
+| Landmark | filled ellipse | radius 8 |
+| Nose | filled ellipse | radius 10 |
+| Eye line | stroke | 3px |
+| Centre cross | two strokes | 2px each, 40px arms |
+
+Nothing has a corner and nothing is clipped. The frame is a rectangle
+because a picture is a rectangle.
 
 ## Components
 
-<!--
-  For each component: a character line, then the shape, the colour
-  assignment, the states, and anything distinctive about its behaviour.
--->
+### The debug image
 
-### Buttons
+- **Shape:** the frame's rectangle, with the photograph stretched across it.
+- **Ground:** black, or the reference picture when it is in the checkout.
+- **Photograph:** at alpha 128, so the frame shows through.
+- **Marks:** the five landmarks, the eye line, the nose and the cross, in
+  the four colours above.
+- **File:** a JPEG, written to `outputs/cn_<original name>` with the
+  original extension. The result carries the path in `debug_image_path`.
 
-- **Shape:** [radius, in words and in parens]
-- **Primary:** [colour assignment and padding]
-- **Hover / Focus:** [transitions, treatments]
+### The result
 
-### Inputs / Fields
-
-- **Style:** [stroke, background, radius]
-- **Focus:** [treatment]
-- **Error / Disabled:** [if applicable]
+- **Shape:** JSON, printed with `indent=2` and `exclude_unset=True`.
+- **Fields:** `success`, then `code` and `text` when a rule failed, then
+  `metadata` with the numbers, then `debug_image_path` when a picture was
+  written.
+- **Order:** the keys keep the order the model declares them in, so a reader
+  of the raw output sees the verdict before the measurements.
 
 ## Do's and Don'ts
 
-<!--
-  Concrete guardrails, each one leading with "Do" or "Don't". Exact values
-  only where they have been established. These are the rules a new screen
-  is measured against, so write them as tests rather than as advice.
--->
-
 ### Do:
 
-- **Do** [specific prescription].
-- **Do** [specific prohibition inverted].
+- **Do** keep the four marks in the four colours: red for the landmarks,
+  green for the eye line, cyan for the nose and yellow for the cross.
+- **Do** keep the geometry as it is: radius 8, radius 10, 3px, 2px, 40px.
+- **Do** write the debug image as a JPEG into `outputs/`, with the `cn_`
+  prefix and the original extension.
 
 ### Don't:
 
-- **Don't** [specific prohibition].
-- **Don't** [specific prohibition].
+- **Don't** add a colour, a font or a shape to the debug image. A fifth
+  mark has to mean a fifth measurement, and there are four measurements.
+- **Don't** put the marks on a panel or under a caption. The photograph is
+  the picture.
+- **Don't** draw the photograph opaque over the frame. The border is the
+  only thing that shows where the picture ends.
+- **Don't** rely on the colour alone. Red against green is the pair that a
+  reader with deuteranopia tells apart least well, and the picture carries
+  no legend.
